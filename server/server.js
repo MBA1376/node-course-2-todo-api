@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+var port = process.env.PORT || 3000;
 
 const {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
@@ -53,8 +54,8 @@ app.get('/todos/:id' , ( req , res ) => {
 });
 
 
-app.listen(3000 , () => {
-	console.log('app running on port 3000');
+app.listen(port , () => {
+	console.log(`app running on port ${port}`);
 });
 
 
