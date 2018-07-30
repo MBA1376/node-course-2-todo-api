@@ -1,3 +1,5 @@
+require('./config/config.js');
+
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -9,7 +11,7 @@ var {Todo} = require('./models/Todo');
 var {User} = require('./models/User');
 
 var app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
@@ -102,6 +104,30 @@ app.patch('/todos/:id' , ( req , res) => {
 		res.status(400).send();
 	});
 	
+});
+
+app.post('/user' , ( req , res ) => {
+	var body = _.pick(req.body , ['email' , 'password']);
+	
+	var user = new User( body );
+	
+	user.save().then( (user) => {
+		return user.generateAuthToken();
+		// res.send( doc );
+	}).then( (token) => {
+		res.header('x-auth' , token).send(user);
+	}).catch( (e) => {
+		res.status(400).send(e);
+	});	
+});
+
+app.get('/user' , ( req , res ) => {
+	
+	User.find().then( (users) => {
+		res.send( JSON.stringify( users , undefined , 2 ) );
+	}).catch( (e) => {
+		res.status(400).send(e);
+	});
 });
 
 app.listen(port , () => {
