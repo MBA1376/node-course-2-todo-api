@@ -9,6 +9,7 @@ const {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/Todo');
 var {User} = require('./models/User');
+var {authenticate} = require('./middleware/authenticate');
 
 var app = express();
 const port = process.env.PORT;
@@ -113,7 +114,6 @@ app.post('/user' , ( req , res ) => {
 	
 	user.save().then( (user) => {
 		return user.generateAuthToken();
-		// res.send( doc );
 	}).then( (token) => {
 		res.header('x-auth' , token).send(user);
 	}).catch( (e) => {
@@ -121,13 +121,10 @@ app.post('/user' , ( req , res ) => {
 	});	
 });
 
-app.get('/user' , ( req , res ) => {
-	
-	User.find().then( (users) => {
-		res.send( JSON.stringify( users , undefined , 2 ) );
-	}).catch( (e) => {
-		res.status(400).send(e);
-	});
+
+
+app.get('/user/me' ,authenticate, ( req , res ) => {
+	res.send(req.user);
 });
 
 app.listen(port , () => {
